@@ -7,6 +7,7 @@ module Network.Transport
   , Connection(..)
   , Event(..)
   , ConnectionId
+  , ConnectionBundle
   , Reliability(..)
   , MulticastGroup(..)
   , EndPointAddress(..)
@@ -33,7 +34,7 @@ import Control.Applicative ((<$>))
 import Data.Typeable (Typeable)
 import Data.Binary (Binary(..))
 import Data.Hashable
-import Data.Word (Word64)
+import Data.Word (Word64, Word32)
 import Data.Data (Data)
 import GHC.Generics (Generic)
 
@@ -82,6 +83,7 @@ data Connection = Connection {
     send :: [ByteString] -> IO (Either (TransportError SendErrorCode) ())
     -- | Close the connection.
   , close :: IO ()
+  , bundle :: ConnectionBundle
   }
 
 -- | Event on an endpoint.
@@ -106,6 +108,9 @@ instance Binary Event
 
 -- | Connection data ConnectHintsIDs enable receivers to distinguish one connection from another.
 type ConnectionId = Word64
+
+-- | Identifier of a carrier of connections.
+type ConnectionBundle = Word32
 
 -- | Reliability guarantees of a connection.
 data Reliability =
@@ -283,7 +288,7 @@ data EventErrorCode =
     -- attempt to fail, and the EventConnectionLost to be posted at that point,
     -- or for the EventConnectionLost to be posted and for the new connection
     -- to be considered the first connection of the "new bundle".
-  | EventConnectionLost EndPointAddress
+  | EventConnectionLost EndPointAddress ConnectionBundle
   deriving (Show, Typeable, Eq, Generic)
 
 instance Binary EventErrorCode
