@@ -63,6 +63,8 @@ data EndPoint = EndPoint {
     -- protocol (TCP, ssh), a call to 'connect' should be asynchronous when a
     -- heavyweight connection has already been established.
   , connect :: EndPointAddress -> Reliability -> ConnectHints -> IO (Either (TransportError ConnectErrorCode) Connection)
+    -- | Close all lightweight connections to and from a given peer.
+  , closeConnectionTo :: EndPointAddress -> IO ()
     -- | Create a new multicast group.
   , newMulticastGroup :: IO (Either (TransportError NewMulticastGroupErrorCode) MulticastGroup)
     -- | Resolve an address to a multicast group.
